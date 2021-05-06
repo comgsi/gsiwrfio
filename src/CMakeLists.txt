@@ -28,17 +28,19 @@ set(fortran_src
   wrf_io.f90)
 
 set(c_src
-  model_data_order.inc
   pack_utils.c)
 
 set(lib_name ${PROJECT_NAME})
 set(module_dir ${CMAKE_CURRENT_BINARY_DIR}/include)
 
-add_library(${lib_name} STATIC ${fortran_src} ${c_src})
+add_library(${lib_name}_f OBJECT ${fortran_src})
+set_target_properties(${lib_name}_f PROPERTIES Fortran_MODULE_DIRECTORY ${module_dir})
+set_property(TARGET ${lib_name}_f PROPERTY Fortran_FORMAT FREE)
 
-set_target_properties(${lib_name} PROPERTIES Fortran_MODULE_DIRECTORY
-                                             ${module_dir})
-set_property(TARGET ${lib_name} PROPERTY Fortran_FORMAT FREE)
+add_library(${lib_name}_c OBJECT ${c_src})
+
+add_library(${lib_name} STATIC $<TARGET_OBJECTS:${lib_name}_f>
+  $<TARGET_OBJECTS:${lib_name}_c>)
 
 target_compile_definitions(${lib_name} PUBLIC "${definitions}")
 
