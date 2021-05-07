@@ -1,21 +1,33 @@
-Lightweight WRF-IO API library for Unified Post Processor (UPP)
+GSI/EnKF WRFIO library
 ---------------------------------------------------------------
 
-## Build instructions
+## Build under the hpc-stack umbrella
 
-load Intel or GNU compiler
-load NetCDF (3.x or 4.x)
+This can be built under the NOAA hpc-stack (https://github.com/NOAA-EMC/hpc-stack).
 
+If the only goal is to build GSI/EnKF, one can clone the hpc-stack code from this fork https://github.com/comgsi/hpc-stack where customized config_comgsi.sh and stack_comgsi.sh are provided to build only those libraries required by GSI/EnKF.
+
+To use the authoritative NOAA hpc-stack and add the gsiwrfio libary, you can follow changes shown here https://github.com/comgsi/hpc-stack/compare/f53255a..848860f
+
+Once completed, you can follow hpc-stack practices to use `module load gsiwrfio/1.0.0` to set gsiwrfio related environmental variables.
+
+You can also elect to build the gsiwrfio library independently as follows and set the `GSIWRFIO_LIB` environmental variable to let GSI/EnKF know where to find the gsiwrfio library.
+
+## Build independently
 ```
-prefix=/path/to/gsiwrfio
-mkdir -p build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=<prefix> ..
+git clone https://github.com/comgsi/gsiwrfio.git
+(... make sure your environment has valid compiler, mpi and netcdf ...)
+cd gsiwrfio
+mkdir build
+cd build
+cmake ..
+make -j2
 ```
 
-The libraries and .mod files will be installed in `<prefix>`
+Once completed, you will find `libgsiwrfio.a` under `build/src/`
 
-To use this library in the application:
-```
-find_package(gsiwrfio)
-cmake -DCMAKE_PREFIX_PATH=<prefix> ..
-```
+Run the following command to set the `GSIWRFIO_LIB` environmental variable:
+
+`export GSIWRFIO_LIB="/path/to/libgsiwrfio.a"`   # use setenv for csh-type shells 
+
+### NOTE: You will need latest GSI/EnKF code (after 05/16/2021) to use the gsiwrfio library.
